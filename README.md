@@ -1,6 +1,6 @@
 ![Ruby](https://github.com/omniauth/omniauth-github/workflows/Ruby/badge.svg?branch=master)
 
-# OmniAuth GitHub
+# OmniAuth Gov
 
 This is the official OmniAuth strategy for authenticating to GitHub. To
 use it, you'll need to sign up for an OAuth2 Application ID and Secret
