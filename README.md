@@ -1,4 +1,4 @@
-![Ruby](https://github.com/omniauth/omniauth-github/workflows/Ruby/badge.svg?branch=master)
+![Ruby](https://github.com/omniauth/omniauth-gov/workflows/Ruby/badge.svg?branch=main)
 
 # OmniAuth Gov
 
@@ -60,7 +60,7 @@ More info on [Scopes](https://docs.github.com/en/developers/apps/scopes-for-oaut
 
 ## Semver
 This project adheres to Semantic Versioning 2.0.0. Any violations of this scheme are considered to be bugs. 
-All changes will be tracked [here](https://github.com/omniauth/omniauth-github/releases).
+All changes will be tracked [here](https://github.com/omniauth/omniauth-gov/releases).
 
 ## License
 
