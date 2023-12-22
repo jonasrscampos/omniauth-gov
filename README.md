@@ -2,70 +2,126 @@
 
 # OmniAuth Gov
 
-This is the official OmniAuth strategy for authenticating to GitHub. To
-use it, you'll need to sign up for an OAuth2 Application ID and Secret
-on the [GitHub OAuth Apps Page](https://github.com/settings/developers).
+Estratégia omniauth para integração do Login Único do governo brasileiro ao autentiador devise.
 
-## Installation
+## Instalação
 
 ```ruby
+gem 'omniauth', '1.9.1'
+gem "omniauth-rails_csrf_protection", '0.1.2'
+gem 'omniauth-oauth2'
 gem 'omniauth-gov', '~> 0.1.0'
 ```
 
-## Basic Usage
+## Configuração devise
+
+Em `config/initializers/devise.rb.rb`
 
 ```ruby
-use OmniAuth::Builder do
-  provider :gov, ENV['GOV_KEY'], ENV['GOV_SECRET']
-end
-```
+  Devise.setup do |config|
+    # ...
+    config.omniauth :gov, 
+      ENV['client_id'], 
+      ENV['client_secret'], 
+    scope: 'openid+email+profile+govbr_confiabilidades+', 
+    callback_path: '/callback-da-aplicacao'
 
-
-## Basic Usage Rails
-
-In `config/initializers/gov.rb`
-
-```ruby
-  Rails.application.config.middleware.use OmniAuth::Builder do
-    provider :gov, ENV['GOV_KEY'], ENV['GOV_SECRET']
+    config.omniauth_path_prefix = '/prefixo-devise/prefixo-omniauth'
   end
 ```
 
+## Initializer
+Em `config/initializer/omniauth.rb`
 
-## Gov Enterprise Usage
-
-```ruby
-provider :gov, ENV['GOV_KEY'], ENV['GOV_SECRET'],
-    {
-      :client_options => {
-        :site => 'https://YOURDOMAIN.com/api/v3',
-        :authorize_url => 'https://YOURDOMAIN.com/login/oauth/authorize',
-        :token_url => 'https://YOURDOMAIN.com/login/oauth/access_token',
-      }
-    }
+```ruby 
+OmniAuth.config.full_host = "<host-da-aplicacao-com-protocolo>"
+OmniAuth.config.logger = Rails.logger
 ```
 
-## Scopes
+## Route
+Em `config/routes.rb`
+```ruby
+  # ...
+  devise_for :users, controllers: {
+    # ...
+    :omniauth_callbacks => 'auth/omniauth_callbacks'
+  }
 
-GitHub API v3 lets you set scopes to provide granular access to different types of data: 
+  # opcional: redirecionar url de callback para o callback do devise
+  devise_scope :user do
+    get 'url-de-callback', to: 'auth/omniauth_callbacks#gov'
+  end
+
+```
+
+## Controller
+Em `controllers/auth/omniauth_callbacks_controller.rb`
 
 ```ruby
-use OmniAuth::Builder do
-  provider :gov, ENV['GOV_KEY'], ENV['GOV_SECRET'], scope: "openid+email+profile+govbr_confiabilidades"
+# frozen_string_literal: true
+
+class Auth::OmniauthCallbacksController < Devise::OmniauthCallbacksController
+	skip_before_action :verify_authenticity_token
+
+	def gov
+		@user = User.from_gov_br_omniauth(request.env["omniauth.auth"]["info"])
+
+		if @user.id.present?
+			sign_in_and_redirect @user, :event => :authentication
+			set_flash_message(:notice, :success, :kind => "Login Unico") if is_navigational_format?	  
+		else
+		end
+	end
+	
+	def failure
+    redirect_to root_path
+	end
+
 end
 ```
 
-More info on [Scopes](https://docs.github.com/en/developers/apps/scopes-for-oauth-apps).
+## Model User
+Em `model/user.rb`
+```ruby
+devise :database_authenticatable,
+  # ...
+  :omniauthable, omniauth_providers: %i[gov]
 
+  # ...
+  def self.from_gov_br_omniauth(info)
+    # Exemplo hash info
+    # {
+    #   "id": 1702579345,
+    #   "cpf": '99999999999',
+    #   "nome_social": 'Nome Social',
+    #   "email_verified": true,
+    #   "profile": 'https://servicos.staging.acesso.gov.br/',
+    #   "username": '99999999999',
+    #   "picture": raw_info["picture"],
+    #   "name": raw_info["name"],
+    #   "email": raw_info["email"],
+    # }    
+    user = User.find_by_email(info["email"]) # ou outra chave
 
-## Semver
-This project adheres to Semantic Versioning 2.0.0. Any violations of this scheme are considered to be bugs. 
-All changes will be tracked [here](https://github.com/omniauth/omniauth-gov/releases).
+    unless user.nil?
+      user.update_attributes(provider: 'login-unico', uid: info["id"])
+    else
+      name = info["name"]
+      email = info["email"]
+      user = User.new do |user|
+        user.name = name
+        user.email = email
+      end
+      user.skip_confirmation!
+      user.save
+    end
 
-## License
+    return user
+  end
 
-Copyright (c) 2011 Michael Bleigh and Intridea, Inc.
+```
 
+## Licença
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
