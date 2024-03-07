@@ -4,9 +4,9 @@ module Omniauth
   module Strategies
     class Gov < OmniAuth::Strategies::OAuth2
       option :client_options, {
-        site: 'https://sso.staging.acesso.gov.br',
-        authorize_url: 'https://sso.staging.acesso.gov.br/authorize',
-        token_url: 'https://sso.staging.acesso.gov.br/token'
+        site: 'https://sso.acesso.gov.br',
+        authorize_url: 'https://sso.acesso.gov.br/authorize',
+        token_url: 'https://sso.acesso.gov.br/token'
       }
       option :pkce, true
 
