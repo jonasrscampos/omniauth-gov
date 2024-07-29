@@ -24,7 +24,8 @@ Em `config/initializers/devise.rb.rb`
       ENV['client_id'], 
       ENV['client_secret'], 
     scope: 'openid+email+profile+govbr_confiabilidades+', 
-    callback_path: '/callback-da-aplicacao'
+    callback_path: '/callback-da-aplicacao',
+    app_url: "https://endereco-do-app.gov.br"
 
     config.omniauth_path_prefix = '/prefixo-devise/prefixo-omniauth'
   end

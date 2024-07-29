@@ -52,6 +52,11 @@ module Omniauth
         end
       end
 
+      def client
+        options.client_options.merge!({connection_opts: {request: {params_encoder: GovBr::ParamsEncoder}}})
+        ::OAuth2::Client.new(options.client_id, options.client_secret, deep_symbolize(options.client_options))
+      end
+
       def authorize_params # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
         options.authorize_params[:state] = SecureRandom.hex(24)
         options.authorize_params[:client_id] = options[:client_id]
@@ -70,11 +75,12 @@ module Omniauth
 
       def build_access_token
         verifier = request.params["code"]
+        redirect_uri = "#{options.app_url}/#{options.callback_path}".gsub!(%r{/+}, '/')
         
         atoken = client.auth_code.get_token(
           verifier, 
-          {"grant_type": "authorization_code", "code": verifier, "redirect_uri": OmniAuth.config.full_host+options.callback_path, "code_verifier": session["omniauth.pkce.verifier"]}, 
-          {"Content-Type"  => "application/x-www-form-urlencoded", "Authorization" => "Basic #{Base64.strict_encode64(Settings.reload!.omniauth.client_id+":"+Settings.reload!.omniauth.client_secret)}" })
+          {"grant_type": "authorization_code", "code": verifier, "redirect_uri": redirect_uri, "code_verifier": session["omniauth.pkce.verifier"]}, 
+          {"Content-Type"  => "application/x-www-form-urlencoded", "Authorization" => "Basic #{Base64.strict_encode64(options.client_id+":"+options.client_secret)}" })
         atoken
       end  
     end
