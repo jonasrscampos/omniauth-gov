@@ -10,7 +10,7 @@ Estratégia omniauth para integração do Login Único do governo brasileiro ao 
 gem 'omniauth', '1.9.1'
 gem "omniauth-rails_csrf_protection", '0.1.2'
 gem 'omniauth-oauth2'
-gem 'omniauth-gov', '~> 0.1.4'
+gem 'omniauth-gov', '~> 0.1.5'
 ```
 
 ## Configuração devise
@@ -24,11 +24,18 @@ Em `config/initializers/devise.rb.rb`
       ENV['client_id'], 
       ENV['client_secret'], 
     scope: 'openid+email+profile+govbr_confiabilidades+', 
-    callback_path: '/callback-da-aplicacao',
-    app_url: "https://endereco-do-app.gov.br"
+    callback_path: '/callback-da-aplicacao'
 
     config.omniauth_path_prefix = '/prefixo-devise/prefixo-omniauth'
   end
+```
+
+## Initializer
+Em `config/initializer/omniauth.rb`
+
+```ruby 
+OmniAuth.config.full_host = "<host-da-aplicacao-com-protocolo>"
+OmniAuth.config.logger = Rails.logger
 ```
 
 ## Route

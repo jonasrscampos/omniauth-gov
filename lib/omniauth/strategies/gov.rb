@@ -75,7 +75,7 @@ module Omniauth
 
       def build_access_token
         verifier = request.params["code"]
-        redirect_uri = "#{options.app_url}/#{options.callback_path}".gsub!(%r{/+}, '/')
+        redirect_uri = "#{OmniAuth.config.full_host}/#{options.callback_path}".gsub!(%r{/+}, '/')
         
         atoken = client.auth_code.get_token(
           verifier, 
