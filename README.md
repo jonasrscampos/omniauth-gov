@@ -10,7 +10,7 @@ Estratégia omniauth para integração do Login Único do governo brasileiro ao 
 gem 'omniauth', '1.9.1'
 gem "omniauth-rails_csrf_protection", '0.1.2'
 gem 'omniauth-oauth2'
-gem 'omniauth-gov', '~> 0.1.5'
+gem 'omniauth-gov', '~> 0.1.8'
 ```
 
 ## Configuração devise
