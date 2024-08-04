@@ -1,5 +1,3 @@
-![Ruby](https://github.com/omniauth/omniauth-gov/workflows/Ruby/badge.svg?branch=main)
-
 # OmniAuth Gov
 
 Estratégia omniauth para integração do Login Único do governo brasileiro ao autentiador devise.
