@@ -86,7 +86,4 @@ module Omniauth
   end
 end
 
-  end
-end
-
 OmniAuth.config.add_camelization 'gov', 'Gov'
