@@ -3,11 +3,6 @@ require 'omniauth-oauth2'
 module Omniauth
   module Strategies
     class Gov < OmniAuth::Strategies::OAuth2
-      option :client_options, {
-        site: 'https://sso.acesso.gov.br',
-        authorize_url: 'https://sso.acesso.gov.br/authorize',
-        token_url: 'https://sso.acesso.gov.br/token'
-      }
       option :pkce, true
 
       credentials do
@@ -40,7 +35,16 @@ module Omniauth
           'raw_info': raw_info
         }
       end
+
+      def client
+        options.client_options.merge!({connection_opts: {request: {params_encoder: GovBr::ParamsEncoder}}})
+        ::OAuth2::Client.new(options.client_id, options.client_secret, deep_symbolize(options.client_options))
+      end
       
+      def request_phase
+        redirect client.auth_code.authorize_url({:redirect_uri => callback_url}.merge(authorize_params))
+      end
+
       def raw_info
         @raw_info ||= JWT.decode(credentials["id_token"], nil, false)[0]
       end
@@ -50,11 +54,6 @@ module Omniauth
           prune!(value) if value.is_a?(Hash)
           value.nil? || (value.respond_to?(:empty?) && value.empty?)
         end
-      end
-
-      def client
-        options.client_options.merge!({connection_opts: {request: {params_encoder: GovBr::ParamsEncoder}}})
-        ::OAuth2::Client.new(options.client_id, options.client_secret, deep_symbolize(options.client_options))
       end
 
       def authorize_params # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
@@ -84,6 +83,9 @@ module Omniauth
         atoken
       end  
     end
+  end
+end
+
   end
 end
 
