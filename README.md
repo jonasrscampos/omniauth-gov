@@ -24,7 +24,12 @@ Em `config/initializers/devise.rb.rb`
       ENV['client_id'], 
       ENV['client_secret'], 
     scope: 'openid+email+profile+govbr_confiabilidades+', 
-    callback_path: '/callback-da-aplicacao'
+    callback_path: '/callback-da-aplicacao',
+    client_options: {
+      site: 'https://sso.acesso.gov.br', # Ambiente de produção.
+      authorize_url: 'https://sso.acesso.gov.br/authorize', # Ambiente de produção.
+      token_url: 'https://sso.acesso.gov.br/token' # Ambiente de produção.
+    }
 
     config.omniauth_path_prefix = '/prefixo-devise/prefixo-omniauth'
   end
@@ -119,6 +124,16 @@ devise :database_authenticatable,
     return user
   end
 
+```
+
+## View
+Em `sessions/new.html.erb`
+```ruby
+      <%= button_to omniauth_authorize_path(resource_name, :gov), class: 'gov-br-btn sign-in br-button middle sign-in w-100 is-primary mt-3 mb-3', data: { turbo: false } do %>
+        <i class="icon fa fa-user fa-lg" style="color: rgb(255, 255, 255);"></i>&nbsp;
+        <span style="font-weight: normal;">Entrar com</span>&nbsp;
+        <span style="font-size: 20px; font-weight: bold;"> gov.br</span>
+      <% end %>
 ```
 
 ## Licença
