@@ -39,7 +39,7 @@ Em `config/initializers/devise.rb.rb`
 Em `config/initializer/omniauth.rb`
 
 ```ruby 
-OmniAuth.config.full_host = "<host-da-aplicacao-com-protocolo>"
+OmniAuth.config.full_host = "https://endereco-do-app.gov.br"
 OmniAuth.config.logger = Rails.logger
 ```
 
