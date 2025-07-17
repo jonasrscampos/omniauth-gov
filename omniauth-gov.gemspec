@@ -16,7 +16,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = OmniAuth::Gov::VERSION
 
-  gem.add_dependency 'omniauth', '1.9.1' 
+  gem.add_dependency 'omniauth', '~> 2.0'
   gem.add_dependency 'omniauth-oauth2'
   gem.add_development_dependency 'rspec', '~> 3.5'
   gem.add_development_dependency 'faraday', '~> 2.9'
